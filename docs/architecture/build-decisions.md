@@ -268,14 +268,87 @@ EMBEDDING_MODEL = 'text-embedding-3-small'  # 1536 dimensions
 
 ---
 
-## Decision E: Testing Framework Strategy (PENDING)
+## Decision E: Testing Framework Strategy
 
-**Status**: To be decided next
+### Decision: pytest + pytest-bdd
 
-**Options under consideration:**
-1. pytest + pytest-bdd (Gherkin support in Python)
-2. behave (Python Gherkin-native framework)
-3. pytest for tests + Gherkin docs separate
+**Rationale:**
+- Gherkin files are executable tests (core ATDD requirement)
+- Leverages pytest's powerful fixture system
+- Excellent async support (pytest-asyncio) for FastAPI and Celery testing
+- Rich plugin ecosystem (coverage, mocking, parallelization)
+- Can mix ATDD acceptance tests with traditional unit tests
+- Great IDE integration (VS Code, PyCharm)
+
+**Project Structure:**
+```
+tests/
+├── features/                    # Gherkin .feature files
+│   ├── 01-capture-basic.feature
+│   ├── 02-capture-files.feature
+│   ├── 03-status-tracking.feature
+│   └── ...
+├── step_defs/                   # pytest-bdd step definitions
+│   ├── conftest.py              # Shared fixtures
+│   ├── test_capture.py          # Steps for capture features
+│   ├── test_enrichment.py       # Steps for enrichment features
+│   └── ...
+├── integration/                 # Integration tests
+│   ├── test_end_to_end.py
+│   └── test_database.py
+├── fixtures/                    # Test data
+│   ├── sample_content.json
+│   └── mock_llm_responses.json
+└── conftest.py                  # Global pytest configuration
+```
+
+**Key Dependencies:**
+```toml
+[tool.poetry.group.test.dependencies]
+pytest = "^8.0"
+pytest-bdd = "^7.0"
+pytest-asyncio = "^0.23"
+pytest-cov = "^4.1"
+pytest-mock = "^3.12"
+httpx = "^0.26"  # For testing FastAPI
+```
+
+**Running Tests:**
+```bash
+# Run all acceptance tests
+pytest tests/features/
+
+# Run specific feature
+pytest tests/features/01-capture-basic.feature
+
+# Run with coverage
+pytest --cov=src tests/
+
+# Run with verbose output
+pytest -v tests/features/
+```
+
+**ATDD Workflow:**
+1. Write Gherkin `.feature` file (acceptance criteria)
+2. Run pytest → Tests fail (Red phase)
+3. Implement step definitions
+4. Implement minimal production code (Green phase)
+5. Refactor while keeping tests green (Refactor phase)
+
+**Tradeoffs Accepted:**
+- Gherkin support is a plugin (not native like behave)
+- Step definition decorators can feel verbose
+- Slightly less elegant Gherkin parsing than behave
+
+**Benefits:**
+- Pytest's flexibility outweighs weaker Gherkin tooling
+- Single framework for all test types (ATDD + unit + integration)
+- Mature ecosystem with excellent documentation
+- Industry standard for Python testing
+
+**Considered But Rejected:**
+- behave: Gherkin-native but weaker async support, smaller ecosystem
+- pytest + separate Gherkin docs: Breaks ATDD feedback loop (specs not executable)
 
 ---
 
@@ -360,10 +433,10 @@ context-substrate/
 1. ✅ **Completed**: Language choice (Python monorepo)
 2. ✅ **Completed**: Database architecture (PostgreSQL + pgvector)
 3. ✅ **Completed**: Message queue (Redis + Celery)
-4. ⏳ **Next**: LLM provider selection
-5. ⏳ **Next**: Testing framework decision
+4. ✅ **Completed**: LLM provider selection (Claude + OpenAI)
+5. ✅ **Completed**: Testing framework decision (pytest + pytest-bdd)
 6. ⏳ **Next**: Generate project scaffold
-7. ⏳ **Next**: Begin ATDD implementation (Feature 1.1: Capture endpoint)
+7. ⏳ **Next**: Begin ATDD implementation (Feature 1.1: Basic Text Capture)
 
 ---
 
