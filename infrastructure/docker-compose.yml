@@ -1,0 +1,151 @@
+version: '3.8'
+
+# Personal Data Collector (PDC) - Local Development Environment
+# Self-hosted infrastructure for context capture and retrieval
+
+services:
+  # ============================================================================
+  # PostgreSQL Database (with pgvector extension)
+  # ============================================================================
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: pdc-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pdc
+      POSTGRES_USER: pdc_user
+      POSTGRES_PASSWORD: pdc_password
+      # Enable pgvector extension on startup
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pdc_user -d pdc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pdc-network
+
+  # ============================================================================
+  # PostgreSQL Database (Test Environment)
+  # ============================================================================
+  postgres-test:
+    image: pgvector/pgvector:pg16
+    container_name: pdc-postgres-test
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pdc_test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d pdc_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pdc-network
+
+  # ============================================================================
+  # Redis (Message Queue + Cache)
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: pdc-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --appendfsync everysec
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pdc-network
+
+  # ============================================================================
+  # Redis (Test Environment)
+  # ============================================================================
+  redis-test:
+    image: redis:7-alpine
+    container_name: pdc-redis-test
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pdc-network
+
+  # ============================================================================
+  # Flower (Celery Monitoring Dashboard)
+  # ============================================================================
+  flower:
+    image: mher/flower:2.0
+    container_name: pdc-flower
+    restart: unless-stopped
+    command: celery --broker=redis://redis:6379/0 flower --port=5555
+    ports:
+      - "5555:5555"
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - pdc-network
+
+# ============================================================================
+# Volumes (Persistent Data)
+# ============================================================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  pdc-network:
+    driver: bridge
+
+# ============================================================================
+# Usage Instructions
+# ============================================================================
+#
+# Start all services:
+#   docker-compose -f infrastructure/docker-compose.yml up -d
+#
+# Stop all services:
+#   docker-compose -f infrastructure/docker-compose.yml down
+#
+# View logs:
+#   docker-compose -f infrastructure/docker-compose.yml logs -f
+#
+# Reset all data (WARNING: Destructive!):
+#   docker-compose -f infrastructure/docker-compose.yml down -v
+#
+# Access services:
+#   PostgreSQL:  localhost:5432 (user: pdc_user, pass: pdc_password, db: pdc)
+#   Redis:       localhost:6379
+#   Flower:      http://localhost:5555
+#
+# Test environment:
+#   PostgreSQL:  localhost:5433 (user: test, pass: test, db: pdc_test)
+#   Redis:       localhost:6380
