@@ -155,14 +155,50 @@ If message loss becomes unacceptable (e.g., >0.1% loss rate), migrate to RabbitM
 
 ---
 
-## Decision D: LLM Provider for Enrichment (PENDING)
+## Decision D: LLM Provider for Enrichment
 
-**Status**: To be decided next
+### Decision: Dual Provider Strategy (Claude + OpenAI)
 
-**Options under consideration:**
-1. Anthropic Claude (Haiku/Sonnet) for enrichment + OpenAI for embeddings
-2. OpenAI (GPT-4o-mini/GPT-4o) for both enrichment and embeddings
-3. Dual provider (Claude enrichment + OpenAI embeddings)
+**Rationale:**
+- Best tool for each job: Claude excels at structured extraction, OpenAI has proven embeddings
+- Hedge against single provider outages or rate limits
+- Cost-effective: Claude Haiku for high-volume tasks, Sonnet for complex analysis
+- Flexibility to compare and optimize over time
+
+**Implementation:**
+```python
+# Enrichment tasks (Anthropic Claude)
+ENRICHMENT_TASKS = {
+    'classification': 'claude-haiku-3-5-20241022',      # Fast, cheap
+    'keyword_extraction': 'claude-haiku-3-5-20241022',  # Fast, cheap
+    'theme_detection': 'claude-sonnet-4-5-20250929',    # Better reasoning
+    'summarization': 'claude-sonnet-4-5-20250929',      # Quality matters
+    'relationship_detection': 'claude-sonnet-4-5-20250929'  # Complex analysis
+}
+
+# Embedding generation (OpenAI)
+EMBEDDING_MODEL = 'text-embedding-3-small'  # 1536 dimensions
+```
+
+**Cost Estimate** (10,000 items/month):
+- Claude Haiku (classification + keywords): ~$5-10/month
+- Claude Sonnet (themes + summaries + relationships): ~$20-30/month
+- OpenAI embeddings: ~$2-5/month
+- **Total: ~$30-45/month**
+
+**Tradeoffs Accepted:**
+- Two API keys to manage (more configuration)
+- Two potential failure modes (need error handling for both)
+- Slightly more complex retry logic
+
+**Benefits:**
+- Resilience: If one provider has issues, can still capture content
+- Optimization: Can A/B test models within each provider
+- Future flexibility: Can swap providers for specific tasks
+
+**Considered But Rejected:**
+- Claude only: No embeddings API (would need 2 providers anyway)
+- OpenAI only: Less reliable structured output, potentially higher cost at scale
 
 ---
 
