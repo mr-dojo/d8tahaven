@@ -11,14 +11,14 @@ The underlying infrastructure for capturing, enriching, storing, retrieving, and
 
 ### Five-Stage Pipeline
 The architectural organization of the system:
-1. **Ingestion** - Accept content
+1. **Capture** - Accept content
 2. **Enrichment** - Extract metadata via LLM
 3. **Storage** - Persist in database
 4. **Retrieval** - Query and package context
 5. **Intelligence** - Synthesize insights
 
 ### Capture Velocity
-The speed at which the system can accept new content. Target: <100ms for ingestion endpoints.
+The speed at which the system can accept new content. Target: <100ms for capture endpoints.
 
 ### Metadata is the Product
 Philosophical principle: Raw text is commodity. Value comes from extracted metadata (classifications, keywords, themes, relationships, embeddings).
@@ -34,7 +34,7 @@ A single piece of captured information (note, idea, document, meeting transcript
 The act of adding content to the system. Results in a `capture_id` for tracking processing status.
 
 ### Capture ID
-Unique identifier (UUID) assigned when content enters the ingestion stage. Used to track async processing status.
+Unique identifier (UUID) assigned when content enters the capture stage. Used to track async processing status.
 
 ### Item ID
 Unique identifier (UUID) for a stored content item in the database. Assigned after enrichment completes.
@@ -75,7 +75,7 @@ Development methodology where Gherkin acceptance criteria are written before imp
 Human-readable language for writing acceptance criteria. Uses `Feature`, `Scenario`, `Given`, `When`, `Then` keywords.
 
 ### Step Definition
-Python code that implements a Gherkin step (e.g., `Given the ingestion service is running`). Bridges acceptance criteria to test code.
+Python code that implements a Gherkin step (e.g., `Given the capture service is running`). Bridges acceptance criteria to test code.
 
 ### pgvector
 PostgreSQL extension for vector similarity search. Supports approximate nearest neighbor search via HNSW or IVFFlat indexes.
@@ -96,7 +96,7 @@ Python distributed task queue for async processing. Used for enrichment tasks.
 In-memory data store used for message queue (Celery broker) and caching.
 
 ### FastAPI
-Modern Python web framework for building APIs. Used for ingestion and retrieval endpoints.
+Modern Python web framework for building APIs. Used for capture and retrieval endpoints.
 
 ---
 
@@ -171,7 +171,7 @@ System-generated items (summaries, trends, recommendations) stored alongside use
 ### P50 / P95 / P99
 Percentile metrics. P95 = 95% of requests complete within this time. Used for performance targets.
 
-### Ingestion Latency
+### Capture Latency
 Time from API request to returning `capture_id`. Target: <100ms.
 
 ### Enrichment Latency

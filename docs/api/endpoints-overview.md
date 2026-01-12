@@ -11,7 +11,7 @@
 
 Endpoints are organized by the five system stages:
 
-1. **Ingestion** (`/v1/ingest/*`) - Capture content
+1. **Capture** (`/v1/capture/*`) - Capture content
 2. **Retrieval** (`/v1/retrieve/*`) - Query and package context
 3. **Intelligence** (`/v1/insights/*`) - Access synthesized insights
 4. **Management** (`/v1/manage/*`) - Admin operations
@@ -20,9 +20,9 @@ Endpoints are organized by the five system stages:
 
 ---
 
-## Stage 1: Ingestion API
+## Stage 1: Capture API
 
-### POST /v1/ingest
+### POST /v1/capture
 **Purpose**: Capture text content
 
 **Request**:
@@ -53,7 +53,7 @@ Endpoints are organized by the five system stages:
 
 ---
 
-### POST /v1/ingest/file
+### POST /v1/capture/file
 **Purpose**: Upload file (PDF, DOCX, TXT)
 
 **Request** (multipart/form-data):
@@ -110,7 +110,7 @@ metadata: {"project": "Research"}
 
 ---
 
-### GET /v1/ingest/recent
+### GET /v1/capture/recent
 **Purpose**: List recently captured items
 
 **Query Parameters**:
@@ -467,7 +467,7 @@ All endpoints use consistent error format:
 ## Rate Limiting
 
 **Default Limits**:
-- Ingestion: 100 requests/minute
+- Capture: 100 requests/minute
 - Retrieval: 300 requests/minute
 - Insights: 60 requests/minute
 

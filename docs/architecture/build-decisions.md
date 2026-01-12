@@ -14,7 +14,7 @@ This document captures the core architectural decisions for building the Context
 **Key Principles:**
 - Infrastructure mindset: Reliability over novelty
 - ATDD methodology: Gherkin acceptance criteria before code
-- Capture velocity: <100ms ingestion response time
+- Capture velocity: <100ms capture response time
 - Metadata quality: Value comes from enrichment, not raw storage
 - Separation of concerns: Five distinct stages
 
@@ -26,7 +26,7 @@ This document captures the core architectural decisions for building the Context
 
 **Rationale:**
 - Best ML/LLM ecosystem for enrichment tasks
-- Mature async support for fast ingestion (<100ms requirement)
+- Mature async support for fast capture (<100ms requirement)
 - Single deployment unit simplifies MVP development
 - Excellent testing ecosystem (pytest + pytest-bdd)
 - Type hints with mypy for infrastructure reliability
@@ -34,7 +34,7 @@ This document captures the core architectural decisions for building the Context
 **Architecture:**
 ```
 Monorepo with clean module boundaries:
-- src/ingestion/     - FastAPI endpoints, queue interface
+- src/capture/       - FastAPI endpoints, queue interface
 - src/enrichment/    - Celery tasks, LLM calls
 - src/storage/       - Database models, migrations
 - src/retrieval/     - Search, scoring, context packaging
@@ -112,7 +112,7 @@ If we consistently exceed performance targets above, consider:
 **Rationale:**
 - Mature Python/Celery integration (battle-tested)
 - Dual-purpose: Message queue + cache (single service)
-- Fast in-memory operations support <100ms ingestion
+- Fast in-memory operations support <100ms capture
 - Excellent monitoring (Flower dashboard)
 - Rich task routing, prioritization, retry patterns
 
@@ -128,7 +128,7 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
 **Dual-Purpose Usage:**
 1. **Message Queue**:
-   - Ingestion → Enrichment tasks
+   - Capture → Enrichment tasks
    - Storage → Intelligence synthesis jobs
 
 2. **Cache**:
@@ -220,7 +220,7 @@ EMBEDDING_MODEL = 'text-embedding-3-small'  # 1536 dimensions
 ```
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
 │             │    │             │    │             │    │             │    │             │
-│  Ingestion  │───▶│ Enrichment  │───▶│   Storage   │───▶│  Retrieval  │───▶│Intelligence │
+│   Capture   │───▶│ Enrichment  │───▶│   Storage   │───▶│  Retrieval  │───▶│Intelligence │
 │  (<100ms)   │    │  (async)    │    │  (persist)  │    │  (<500ms)   │    │  (batch)    │
 │             │    │             │    │             │    │             │    │             │
 └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
@@ -233,7 +233,7 @@ EMBEDDING_MODEL = 'text-embedding-3-small'  # 1536 dimensions
 
 | Component | Technology | Purpose |
 |-----------|------------|---------|
-| API Framework | FastAPI | Fast ingestion/retrieval endpoints |
+| API Framework | FastAPI | Fast capture/retrieval endpoints |
 | Task Queue | Celery | Async enrichment processing |
 | Message Broker | Redis | Queue + cache dual-purpose |
 | Database | PostgreSQL + pgvector | Relational + vector + graph storage |
@@ -273,7 +273,7 @@ context-substrate/
 │   ├── integration/         # Integration test suites
 │   └── fixtures/            # Test data and mocks
 ├── src/
-│   ├── ingestion/           # Stage 1: API, queue interface
+│   ├── capture/             # Stage 1: API, queue interface
 │   ├── enrichment/          # Stage 2: Celery tasks, LLM
 │   ├── storage/             # Stage 3: Models, migrations
 │   ├── retrieval/           # Stage 4: Search, scoring
@@ -297,7 +297,7 @@ context-substrate/
 4. ⏳ **Next**: LLM provider selection
 5. ⏳ **Next**: Testing framework decision
 6. ⏳ **Next**: Generate project scaffold
-7. ⏳ **Next**: Begin ATDD implementation (Feature 1.1: Ingestion endpoint)
+7. ⏳ **Next**: Begin ATDD implementation (Feature 1.1: Capture endpoint)
 
 ---
 
@@ -305,7 +305,7 @@ context-substrate/
 
 The system is complete when:
 - ✅ All 20+ feature acceptance tests pass
-- ✅ Performance: Ingestion <100ms, Retrieval <500ms
+- ✅ Performance: Capture <100ms, Retrieval <500ms
 - ✅ APIs documented with OpenAPI specs
 - ✅ Docker Compose runs all services locally
 - ✅ End-to-end integration test (capture → retrieve → agent packaging)

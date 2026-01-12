@@ -18,23 +18,23 @@ Features are organized by the five pipeline stages. Each feature will follow the
 
 ---
 
-## Stage 1: Ingestion Layer
+## Stage 1: Capture Layer
 *Goal: Accept content via API with <100ms response time*
 
-### Feature 1.1: Basic Text Ingestion ⏳
-- **Endpoint**: `POST /v1/ingest`
+### Feature 1.1: Basic Text Capture ⏳
+- **Endpoint**: `POST /v1/capture`
 - **Purpose**: Accept text content and queue for enrichment
-- **Acceptance Criteria**: `tests/features/01-ingestion-basic.feature`
+- **Acceptance Criteria**: `tests/features/01-capture-basic.feature`
 - **Key Scenarios**:
   - Successfully capture text with metadata
   - Reject requests with missing required fields
   - Return capture_id within 100ms
   - Queue enrichment task to Redis
 
-### Feature 1.2: File Upload Ingestion ⏳
-- **Endpoint**: `POST /v1/ingest/file`
+### Feature 1.2: File Upload Capture ⏳
+- **Endpoint**: `POST /v1/capture/file`
 - **Purpose**: Accept PDF, DOCX, TXT files
-- **Acceptance Criteria**: `tests/features/02-ingestion-files.feature`
+- **Acceptance Criteria**: `tests/features/02-capture-files.feature`
 - **Key Scenarios**:
   - Extract text from PDF files
   - Extract text from DOCX files
@@ -52,14 +52,53 @@ Features are organized by the five pipeline stages. Each feature will follow the
   - Return "completed" status when stored
   - Return "failed" status with error details
 
-### Feature 1.4: Ingestion Error Handling ⏳
+### Feature 1.4: Capture Error Handling ⏳
 - **Purpose**: Graceful degradation and clear error messages
-- **Acceptance Criteria**: `tests/features/04-ingestion-errors.feature`
+- **Acceptance Criteria**: `tests/features/04-capture-errors.feature`
 - **Key Scenarios**:
   - Handle malformed JSON gracefully
   - Validate content length (max 100k characters)
   - Rate limiting (100 requests/minute per user)
   - Return appropriate HTTP status codes
+
+### Feature 1.5: Browser Plugin - SAVE Mode ⏳
+- **Interface**: Chrome/Firefox Extension
+- **Purpose**: One-click capture from any webpage (primary capture interface)
+- **Acceptance Criteria**: `tests/features/05-browser-plugin-save.feature`
+- **Key Scenarios**:
+  - Detect text selection on any webpage
+  - Show "Save to PDC" button on text highlight
+  - Capture with single click (no forms, no interruption)
+  - Auto-capture source URL, page title, domain
+  - Visual confirmation (toast notification)
+  - Handle authentication (API key storage)
+  - Work across different website structures
+- **Technical Requirements**:
+  - Manifest v3 compatibility
+  - Content script injection
+  - Background service worker
+  - Secure API key storage
+  - POST to `/v1/capture` endpoint
+
+### Feature 1.6: Browser Plugin - GET Context Mode ⏳
+- **Interface**: Chrome/Firefox Extension
+- **Purpose**: Inject relevant context into LLM text inputs
+- **Acceptance Criteria**: `tests/features/06-browser-plugin-get.feature`
+- **Key Scenarios**:
+  - Detect LLM interface text inputs (Claude, ChatGPT, etc.)
+  - Show "Get Context" button near input field
+  - Read user's current prompt text
+  - Query PDC retrieval API with prompt
+  - Insert formatted context block at cursor
+  - Handle token budget limits
+  - Allow user to review/edit before sending
+  - Work with multiple LLM interfaces
+- **Technical Requirements**:
+  - DOM manipulation for button injection
+  - Cursor position detection
+  - POST to `/v1/retrieve/context` endpoint
+  - Markdown formatting
+  - Token estimation
 
 ---
 
@@ -321,8 +360,8 @@ Features are organized by the five pipeline stages. Each feature will follow the
 
 ## Milestones
 
-### Milestone 1: MVP Ingestion (Features 1.1-1.4) ⏳
-Can capture text content and track status.
+### Milestone 1: MVP Capture (Features 1.1-1.6) ⏳
+Can capture text content via API and browser plugin, track status.
 
 ### Milestone 2: Full Enrichment (Features 2.1-2.6) ⏳
 LLM pipeline extracts all metadata types.
@@ -338,6 +377,6 @@ System generates insights and recommendations.
 
 ---
 
-**Next Action**: Begin Feature 1.1 (Basic Text Ingestion) using ATDD methodology.
+**Next Action**: Begin Feature 1.1 (Basic Text Capture) using ATDD methodology.
 
 **Last Updated**: 2026-01-12
