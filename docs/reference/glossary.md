@@ -15,7 +15,7 @@ The architectural organization of the system:
 2. **Enrichment** - Extract metadata via LLM
 3. **Storage** - Persist in database
 4. **Retrieval** - Query and package context
-5. **Intelligence** - Synthesize insights
+5. **Intelligence** - Synthesize insights (optional, progressive enhancement)
 
 ### Capture Velocity
 The speed at which the system can accept new content. Target: <100ms for capture endpoints.
@@ -145,6 +145,8 @@ Parameter (0.0-1.0) controlling how much to favor recent items in relevance scor
 ---
 
 ## Intelligence Terms
+
+**Note**: Intelligence features are **optional** progressive enhancements. The core PDC loop (Capture → Enrich → Store → Retrieve) is fully functional without these features. All intelligence features can be disabled via configuration.
 
 ### Synthesis
 Aggregating multiple content items to generate higher-level insights (e.g., weekly summary).

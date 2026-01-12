@@ -290,8 +290,10 @@ Features are organized by the five pipeline stages. Each feature will follow the
 
 ---
 
-## Stage 5: Intelligence Layer
+## Stage 5: Intelligence Layer (Progressive Enhancement)
 *Goal: Synthesize insights from accumulated context*
+
+**Note**: This stage is **optional** and represents progressive enhancement beyond the core PDC loop (Capture → Enrich → Store → Retrieve). All features in this stage can be disabled via configuration. The system is fully functional with just Stages 1-4.
 
 ### Feature 5.1: Weekly Synthesis ⏳
 - **Task**: `weekly_synthesis_task`
@@ -370,10 +372,10 @@ LLM pipeline extracts all metadata types.
 All data persisted with search capabilities.
 
 ### Milestone 4: Retrieval Ready (Features 4.1-4.5) ⏳
-Agents can query and package context.
+Agents can query and package context. **Core PDC loop complete at this milestone.**
 
-### Milestone 5: Intelligence Active (Features 5.1-5.4) ⏳
-System generates insights and recommendations.
+### Milestone 5: Intelligence Active (Features 5.1-5.4) ⏳ [Optional]
+System generates insights and recommendations. **Progressive enhancement - can be disabled.**
 
 ---
 

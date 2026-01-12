@@ -213,7 +213,7 @@ metadata: {"project": "Research"}
 ---
 
 ### POST /v1/retrieve/context
-**Purpose**: Package context for LLM agent prompts
+**Purpose**: Package context for LLM agent prompts (primary endpoint for browser plugin GET mode)
 
 **Request**:
 ```json
@@ -252,6 +252,18 @@ metadata: {"project": "Research"}
   }
 }
 ```
+
+**Browser Plugin Usage**:
+```javascript
+// Browser extension GET mode simplified request
+{
+  "query": "Help me write about data sovereignty",  // User's current prompt
+  "max_tokens": 4000,
+  "format": "markdown"  // Returns formatted_markdown directly
+}
+```
+
+**Performance**: <500ms response time
 
 ---
 

@@ -20,6 +20,72 @@ This document captures the core architectural decisions for building the Context
 
 ---
 
+## PDC Core Principles: Data Sovereignty First
+
+This system implements the **Personal Data Collector (PDC)** vision, where data ownership and user sovereignty are non-negotiable.
+
+### 1. You Own Your Data
+**All data resides under your control.**
+- Self-hosted infrastructure (Docker Compose for local deployment)
+- No third-party services required (PostgreSQL, Redis run locally)
+- No data sent to external services except your chosen LLM providers
+- Export everything at any time (full JSON/CSV dumps)
+- Open schema, inspectable database
+
+**Deployment Options:**
+- Local machine (laptop, desktop)
+- Personal server (home server, NAS)
+- Your own VPS (DigitalOcean, Linode, etc.)
+- Your own cloud VM (AWS EC2, GCP Compute, etc.)
+
+**You choose. We don't host anything.**
+
+### 2. Solution Agnostic
+**Works with any LLM, any workflow, any client.**
+- REST APIs (not proprietary SDK)
+- Standard formats (JSON, Markdown)
+- Browser plugin works with Claude, ChatGPT, Copilot, any LLM interface
+- Can integrate with any tool via HTTP API
+
+**This is infrastructure, not a product.** You bring your own LLM. You bring your own hosting. You control everything.
+
+### 3. Minimal Friction Capture
+**Capturing knowledge must never interrupt flow.**
+- <100ms API response (FastAPI async endpoints)
+- One-click browser plugin (no forms, no fields)
+- Async enrichment (don't wait for LLM processing)
+- Queue-based architecture (capture succeeds even if downstream fails)
+
+**The best capture system is the one you actually use.** If it takes more than 2 seconds, you won't use it consistently.
+
+### 4. Progressive Enhancement
+**Start simple. Add complexity as needed.**
+- MVP = Capture + Store + Basic Retrieval (3 stages)
+- Enrichment is optional (can disable LLM calls)
+- Intelligence is optional (can disable weekly summaries)
+- Browser plugin is optional (API works standalone)
+
+**Don't require features you don't need.** The system should work at whatever level of sophistication you want.
+
+### How These Principles Influence Technical Decisions
+
+| PDC Principle | Technical Choice | Why |
+|---------------|------------------|-----|
+| Data Sovereignty | PostgreSQL (not cloud DB) | Database runs on your machine |
+| Data Sovereignty | Redis (not AWS SQS) | Queue runs locally |
+| Data Sovereignty | Docker Compose | Single-command local deployment |
+| Data Sovereignty | Export endpoints | GET /v1/export/all dumps everything |
+| Solution Agnostic | REST APIs | Any HTTP client can integrate |
+| Solution Agnostic | Dual LLM provider | Not locked to one vendor |
+| Solution Agnostic | Standard formats | JSON/Markdown work everywhere |
+| Minimal Friction | <100ms capture | FastAPI async, no blocking |
+| Minimal Friction | Browser plugin primary | One-click from any page |
+| Minimal Friction | Optional metadata | Don't require user input |
+| Progressive Enhancement | Feature flags | Turn stages on/off in config |
+| Progressive Enhancement | Monorepo structure | Start simple, extract later |
+
+---
+
 ## Decision A: Project Structure & Language Choice
 
 ### Decision: Python Monorepo (FastAPI + Celery + SQLAlchemy)
