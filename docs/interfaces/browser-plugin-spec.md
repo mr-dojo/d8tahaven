@@ -87,7 +87,7 @@ Just type. No prefix needed.
 
 Press Enter to save selection with optional note.
 
-**Feedback**: Palette shows "Saved ✓" inline, closes, then toast appears.
+**Feedback**: Palette shows "Saved ✓" inline and toast appears simultaneously, then palette closes.
 
 ---
 
@@ -470,10 +470,10 @@ class PDCPalette {
 
     await this.save(content);
     this.showSuccess('Saved ✓');
+    this.showToast('Saved to PDC');
 
     setTimeout(() => {
       this.close();
-      this.showToast('Saved to PDC');
     }, 400);
   }
 
