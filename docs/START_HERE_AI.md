@@ -127,13 +127,23 @@ CREATE INDEX ON embeddings USING hnsw (embedding_vector vector_cosine_ops);
 
 ### Documentation (Read for Context)
 
+**V1 Reference (Read These)**:
 | File | What It Covers | Priority |
 |------|----------------|----------|
 | `docs/architecture/build-decisions.md` | Why PostgreSQL, why Celery, all tech choices | 🔴 Read first |
-| `docs/api/endpoints-overview.md` | Complete API spec (25+ endpoints) | 🟡 Reference for v1 endpoints |
-| `docs/data-models/schema-overview.md` | 9-table database schema | 🟡 Reference for v1 tables |
-| `docs/features/roadmap.md` | 25+ features with acceptance criteria | 🟢 Skim for context |
-| `docs/interfaces/browser-plugin-spec.md` | 1381-line extension spec | 🟢 V2 reference only |
+| `docs/architecture/pdc-principles.md` | Core philosophy, prevents scope creep | 🔴 Read first |
+| `docs/v1-reference/api-v1.md` | V1 API spec (4 endpoints only) | 🔴 Essential |
+| `docs/v1-reference/schema-v1.md` | V1 database schema (2 tables only) | 🔴 Essential |
+| `docs/v1-reference/browser-extension-v1.md` | Simple popup extension (~200 LOC) | 🔴 Essential |
+
+**Future Vision (Ignore Until V1 Ships)**:
+| File | What It Covers | When to Read |
+|------|----------------|--------------|
+| `docs/v2-vision/browser-plugin-full.md` | Command palette + ghost button (1381 lines) | After V1 proves valuable |
+| `docs/v2-vision/README.md` | What's deferred and why | When tempted to add features |
+| `docs/api/endpoints-overview.md` | Complete API spec (25+ endpoints) | V2+ planning |
+| `docs/data-models/schema-overview.md` | Full 9-table schema | V2+ planning |
+| `docs/features/roadmap.md` | 25+ features with acceptance criteria | V2+ planning |
 
 ### Configuration
 
@@ -500,6 +510,7 @@ Welcome to the recursive loop. Let's build this thing.
 
 ---
 
-**Last Session**: 2026-01-13 - Down-scoped v1, created this guide
+**Last Session**: 2026-01-13 - Down-scoped v1, created this guide, reorganized docs
+**Documentation Structure**: V1-focused docs in `v1-reference/`, future vision in `v2-vision/`
 **Next Session**: Start Phase 1 (Database Layer) or Phase 2 (Embeddings)
 **Current Commit**: On branch `claude/analyze-capture-upload-fO8SH`
